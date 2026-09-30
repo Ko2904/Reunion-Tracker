@@ -22,7 +22,7 @@ CONFIG_FILE = DATA_DIR / "config.json"
 PHOTO_FILES = {"leonie": DATA_DIR / "leonie.jpg", "ko": DATA_DIR / "ko.jpg"}
 
 INK = "#4a3b47"
-RED = "#e0245e"
+RED = "#8f1d2c"
 
 st.set_page_config(page_title=APP_TITLE, page_icon="❤️", layout="centered")
 
@@ -33,6 +33,11 @@ st.markdown(
     .stApp { background: #ffffff; }
     #MainMenu, footer, header { visibility: hidden; }
     .block-container { max-width: 760px; padding-top: 1.5rem; }
+    [data-testid="stExpander"] summary p,
+    [data-testid="stDateInput"] label p,
+    [data-testid="stExpander"] p strong,
+    [data-testid="stFileUploader"] label p,
+    [data-testid="stExpander"] summary svg { color: #8f1d2c !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -226,6 +231,18 @@ PAGE = """
     .heart-wrap, .bob, .fh { animation: none; }
     .fh { opacity: 1; }
   }
+  @media (max-width: 480px) {
+    body { padding: 4px 8px 18px; }
+    .brand { gap: 8px; margin-top: 2px; }
+    .brand svg { width: 28px; height: 25px; }
+    h1 { font-size: clamp(24px, 8.5vw, 32px); }
+    .sub { margin-bottom: 14px; font-size: 13px; }
+    .heart-wrap { width: min(280px, 78vw); }
+    .date { margin-top: 18px; font-size: 15px; }
+    .progress { padding: 0 4px; font-size: 13px; }
+    .scene { margin-top: 14px; }
+    .name { font-size: 18px; }
+  }
 </style>
 </head>
 <body>
@@ -285,7 +302,7 @@ def render_page(reunion: date, start: date, today: date, girl_uri, boy_uri):
         .replace("__PROGRESS__", tagline)
         .replace("__SCENE__", scene_svg(progress, reunited, girl_uri, boy_uri))
     )
-    components.html(html, height=880, scrolling=False)
+    components.html(html, height=840, scrolling=False)
 
 
 # ----------------------------------------------------------------------------
@@ -305,10 +322,7 @@ if first_run:
 st.session_state.setdefault("uploader_version", 0)
 ver = st.session_state["uploader_version"]
 
-# The visual is created first so it always reflects the settings below.
-visual = st.container()
-
-with st.expander("Settings", expanded=first_run):
+with st.expander("Settings", expanded=True):
     new_reunion = st.date_input(
         "Reunion date",
         value=date.fromisoformat(cfg["reunion"]),
@@ -342,6 +356,7 @@ with st.expander("Settings", expanded=first_run):
                 st.rerun()
     st.caption("Everything is saved automatically and stays until you change it.")
 
+visual = st.container()
 with visual:
     render_page(
         reunion=date.fromisoformat(cfg["reunion"]),
